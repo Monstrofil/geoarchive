@@ -24,7 +24,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "click",
+  "pytermgui"
+]
 
 [project.urls]
 Documentation = "https://github.com/unknown/geoarchive#readme"
