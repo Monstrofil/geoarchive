@@ -1,13 +1,8 @@
-import os
-import time
 from pathlib import Path
 
 import click
-import pytermgui
-from pytermgui import Container, Label, Splitter, Button, Checkbox, Window, Overflow
-from pytermgui.widgets.boxes import Box
-
 from geoarchive.project import Project
+from geoarchive.services import get_service_protocol
 
 workdir = Path('.')
 
@@ -58,7 +53,6 @@ def import_sources(path: Path, type: str, url: str):
 
     assert type == 'softpro', 'Unsupported source type'
 
-    from geoarchive.services import get_service_protocol
     protocol = get_service_protocol(type, url)
 
     confirmed_layers = []
@@ -74,32 +68,6 @@ def import_sources(path: Path, type: str, url: str):
     project.save(path)
 
     click.echo('Importing sources type=%s url=%s' % (type, url))
-
-
-
-@cli.command()
-def tui():
-    import pytermgui as ptg
-
-    def macro_time(fmt: str) -> str:
-        return time.strftime(fmt)
-
-    ptg.tim.define("!time", macro_time)
-
-    with ptg.WindowManager() as manager:
-        layout = manager.layout
-        layout.add_slot("Header", height=5)
-        layout.add_slot("Header Left", width=0.2)
-
-        layout.add_break()
-
-        layout.add_slot("Body Left", width=0.2)
-        layout.add_slot("Body", width=0.7)
-        layout.add_slot("Body Right")
-
-        layout.add_break()
-
-        layout.add_slot("Footer", height=3)
 
 
 if __name__ == '__main__':

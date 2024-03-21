@@ -13,10 +13,24 @@ class Project(object):
         self._config = config or ProjectConfig()
 
     def add_source(self, layer: Layer) -> None:
-        assert layer.type == 'tms', f"Non tms ({layer.type}) is not supported right now"
+        assert layer.type == 'tms', \
+            f"Non tms ({layer.type}) is not supported right now"
 
-        self._config.sources.append(TMSSourceConfig(
-            name=layer.name, type=layer.type, url=layer.url, bounds=layer.bounds))
+        try:
+            exiting_layer = next(layer for name in self._config.sources if name == layer.name)
+        except StopIteration:
+            exiting_layer = None
+
+        if exiting_layer is None:
+            logging.info('Layer %s does not exists, adding new', layer.name)
+            self._config.sources.append(TMSSourceConfig(
+                name=layer.name, type=layer.type,
+                url=layer.url, bounds=layer.bounds
+            ))
+        else:
+            logging.info('Layer %s already exists, updating', layer.name)
+            exiting_layer.url = layer.url
+            exiting_layer.bounds = layer.bounds
 
     def get_sources(self) -> list[TMSSourceConfig]:
         return self._config.sources
