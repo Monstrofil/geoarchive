@@ -28,7 +28,7 @@ def status(path):
 
     click.echo('Sources:')
     for source in project.get_sources():
-        click.echo(f' - source type={source.type} cached={source.cached_at} refrest={source.refresh_interval}')
+        click.echo(f' - source name={source.name} type={source.type} cached={source.cached_at} refrest={source.refresh_interval}')
 
 
 @cli.command()
@@ -46,13 +46,10 @@ def add_source(path: Path, type: str, url: str, name: str):
 
 @cli.command()
 @click.option('--path', default=workdir, type=Path)
-@click.option('--type', default='softpro', type=str, required=True)
+@click.option('--type', type=str, required=True)
 @click.option('--url', type=str, required=True)
 def import_sources(path: Path, type: str, url: str):
     project = Project.load(path)
-
-    assert type == 'softpro', 'Unsupported source type'
-
     protocol = get_service_protocol(type, url)
 
     confirmed_layers = []
@@ -68,6 +65,15 @@ def import_sources(path: Path, type: str, url: str):
     project.save(path)
 
     click.echo('Importing sources type=%s url=%s' % (type, url))
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
+def rewrite(path: Path):
+    project = Project.load(path)
+    project.save(path)
+
+    click.echo('Rewriting configs')
 
 
 if __name__ == '__main__':

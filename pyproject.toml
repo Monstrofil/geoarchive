@@ -27,7 +27,8 @@ dependencies = [
   "pydantic",
   "pydantic-settings",
   "python-slugify",
-  "requests"
+  "requests",
+  "pyyaml"
 ]
 
 [project.urls]

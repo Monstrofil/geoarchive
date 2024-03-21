@@ -50,11 +50,19 @@ class SoftProService:
                 logging.info('Skip %s layer because of incompatible bounds', layer['name'])
                 continue
 
+            url = layer['url'].replace(
+                '{z}', '%(z)s'
+            ).replace(
+                '{x}', '%(x)s'
+            ).replace(
+                '{y}', '%(y)s'
+            )
             layers.append(Layer(
                 name=slugify(layer['category'] + ' ' + layer['name']),
                 type='tms',
                 bounds=tuple(map(float, layer['bounds'].split(','))),
-                url=f"{self._url_parts.scheme}://{self._url_parts.hostname}{layer['url']}"
+                url=f"{self._url_parts.scheme}://{self._url_parts.hostname}{url}"
             ))
+        # https://gis.khm.gov.ua/api/format/layer-list-pt?map_id=map205463
 
         return layers

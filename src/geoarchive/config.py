@@ -7,6 +7,7 @@ import pydantic
 class TMSSourceConfig(pydantic.BaseModel):
     type: Literal['tms']
     url: str
+    name: str
 
     bounds: tuple[float, float, float, float]
 
