@@ -1,6 +1,12 @@
+import os
 import time
+from pathlib import Path
 
 import click
+
+from geoarchive.project import Project
+
+workdir = Path('.')
 
 
 @click.group()
@@ -9,8 +15,31 @@ def cli():
 
 
 @cli.command()
-def init():
-    click.echo('Initialized the database')
+@click.argument('project_name')
+def init(project_name: str):
+    Project.create(workdir / project_name, name=project_name)
+    click.echo('Initialized the project')
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
+def status(path):
+    project = Project.load(path)
+
+    click.echo(f'Project name: {project.name}')
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
+@click.option('--type', default='tms', type=str, required=True)
+@click.option('--url', type=str, required=True)
+@click.option('--name', type=str, required=True)
+def add_source(path: Path, type: str, url: str, name: str):
+    project = Project.load(path)
+    project.add_source(type, name, url)
+    project.save(path)
+
+    click.echo('Adding source name=%s type=%s url=%s' % (name, type, url))
 
 
 @cli.command()
