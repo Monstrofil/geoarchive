@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Self
 
 from geoarchive.config import ProjectConfig, TMSSourceConfig
+from geoarchive.services.base import Layer
 
 
 class Project(object):
@@ -11,11 +12,17 @@ class Project(object):
     def __init__(self, config: ProjectConfig | None = None):
         self._config = config or ProjectConfig()
 
-    def add_source(self, type: str, name: str, url: str) -> None:
-        assert type == 'tms', "Non tms is not supported right now"
+    def add_source(self, layer: Layer) -> None:
+        assert layer.type == 'tms', f"Non tms ({layer.type}) is not supported right now"
 
         self._config.sources.append(TMSSourceConfig(
-            name=name, type=type, url=url))
+            name=layer.name, type=layer.type, url=layer.url, bounds=layer.bounds))
+
+    def get_sources(self) -> list[TMSSourceConfig]:
+        return self._config.sources
+
+    def remove_source(self, name: str):
+        ...
 
     @property
     def name(self) -> str:

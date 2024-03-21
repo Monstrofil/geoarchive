@@ -8,8 +8,12 @@ class TMSSourceConfig(pydantic.BaseModel):
     type: Literal['tms']
     url: str
 
+    bounds: tuple[float, float, float, float]
+
     created_at: datetime = pydantic.Field(default_factory=datetime.now)
     cached_at: datetime | None = None
+
+    refresh_interval: int | None = None
 
 
 class WMSSourceConfig(pydantic.BaseModel):

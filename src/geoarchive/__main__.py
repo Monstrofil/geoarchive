@@ -3,6 +3,9 @@ import time
 from pathlib import Path
 
 import click
+import pytermgui
+from pytermgui import Container, Label, Splitter, Button, Checkbox, Window, Overflow
+from pytermgui.widgets.boxes import Box
 
 from geoarchive.project import Project
 
@@ -26,7 +29,11 @@ def init(project_name: str):
 def status(path):
     project = Project.load(path)
 
-    click.echo(f'Project name: {project.name}')
+    click.echo(f'Project: {project.name}')
+
+    click.echo('Sources:')
+    for source in project.get_sources():
+        click.echo(f' - source type={source.type} cached={source.cached_at} refrest={source.refresh_interval}')
 
 
 @cli.command()
@@ -40,6 +47,34 @@ def add_source(path: Path, type: str, url: str, name: str):
     project.save(path)
 
     click.echo('Adding source name=%s type=%s url=%s' % (name, type, url))
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
+@click.option('--type', default='softpro', type=str, required=True)
+@click.option('--url', type=str, required=True)
+def import_sources(path: Path, type: str, url: str):
+    project = Project.load(path)
+
+    assert type == 'softpro', 'Unsupported source type'
+
+    from geoarchive.services import get_service_protocol
+    protocol = get_service_protocol(type, url)
+
+    confirmed_layers = []
+    for layer in protocol.list():
+        if click.confirm(f"Do you want to include layer {layer.name}?", default=True):
+            confirmed_layers.append(layer)
+
+    click.echo(confirmed_layers)
+
+    for layer in confirmed_layers:
+        project.add_source(layer)
+
+    project.save(path)
+
+    click.echo('Importing sources type=%s url=%s' % (type, url))
+
 
 
 @cli.command()
