@@ -28,13 +28,17 @@ dependencies = [
   "pydantic-settings",
   "python-slugify",
   "requests",
-  "pyyaml"
+  "pyyaml",
+  "BeautifulSoup4"
 ]
 
 [project.urls]
 Documentation = "https://github.com/unknown/geoarchive#readme"
 Issues = "https://github.com/unknown/geoarchive/issues"
 Source = "https://github.com/unknown/geoarchive"
+
+[project.scripts]
+geocache-cli = "geoarchive.cli:cli"
 
 [tool.hatch.version]
 path = "src/geoarchive/__about__.py"

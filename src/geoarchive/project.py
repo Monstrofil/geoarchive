@@ -1,9 +1,11 @@
 import logging
+import subprocess
 from pathlib import Path
 from typing import Self
 
 import yaml
 
+from geoarchive import environment
 from geoarchive.config import ProjectConfig, TMSSourceConfig
 from geoarchive.services.base import Layer
 
@@ -136,7 +138,7 @@ class Project(object):
 
     @classmethod
     def load(cls, path: Path) -> Self:
-        logging.info('Saving project %s', path)
+        logging.info('Loading project %s', path)
         config_file = path / cls._CONFIG_FILE
         if not config_file.exists():
             raise FileNotFoundError(config_file)
@@ -156,6 +158,7 @@ class Project(object):
 
         configuration = ProjectConfig(name=name)
         project = cls(config=configuration)
+        environment.create_env(path)
         project.save(path)
 
         return project
