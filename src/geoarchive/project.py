@@ -5,7 +5,7 @@ from typing import Self
 
 import yaml
 
-from geoarchive import environment
+from geoarchive import environment, mapproxy
 from geoarchive.config import ProjectConfig, TMSSourceConfig
 from geoarchive.services.base import Layer
 
@@ -51,90 +51,7 @@ class Project(object):
         with open(path / self._CONFIG_FILE, 'w') as f:
             f.write(self._config.model_dump_json(indent=2))
 
-        sources = {
-            layer.name: dict(
-                coverage=dict(
-                    bbox=list(layer.bounds),
-                    srs='EPSG:4326'
-                ),
-                http=dict(
-                    ssl_no_cert_checks=True
-                ),
-                grid='GLOBAL_WEBMERCATOR',
-                type='tile',
-                url=layer.url
-            )
-            for layer in self._config.sources
-        }
-
-        layers = [
-            dict(
-                name=layer.name,
-                sources=[
-                    f'cache-{layer.name}'
-                ],
-                title=layer.name
-            )
-            for layer in self._config.sources
-        ]
-
-        caches = {
-            f'cache-{layer.name}': dict(
-                cache=dict(type='compact', version=2),
-                grids=['webmercator'],
-                sources=[layer.name]
-            )
-            for layer in self._config.sources
-        }
-
-        services = dict(
-            demo=dict(),
-            tms=dict()
-        )
-
-        config = dict(
-            sources=sources,
-            layers=layers,
-            caches=caches,
-            services=services,
-            grids=dict(
-                webmercator=dict(base='GLOBAL_WEBMERCATOR')
-            )
-        )
-
-        with open(path / 'mapproxy.yaml', 'w') as f:
-            yaml.dump(config, f, default_flow_style=False)
-
-        seeds = {
-            layer.name: dict(
-                caches=[
-                    f'cache-{layer.name}'
-                ],
-                coverages=[
-                    layer.name
-                ],
-                levels=dict(
-                    to=16
-                )
-            )
-            for layer in self._config.sources
-        }
-
-        coverages = {
-            layer.name: dict(
-                bbox=list(layer.bounds),
-                srs='EPSG:4326'
-            )
-            for layer in self._config.sources
-        }
-
-        seeds = dict(
-            coverages=coverages,
-            seeds=seeds
-        )
-
-        with open(path / 'seeds.yaml', 'w') as f:
-            yaml.dump(seeds, f, default_flow_style=False)
+        mapproxy.write_config(self._config.sources, path)
 
     @classmethod
     def load(cls, path: Path) -> Self:
