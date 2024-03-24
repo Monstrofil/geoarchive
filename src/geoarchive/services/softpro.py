@@ -38,15 +38,12 @@ class SoftProService:
 
         layers = []
         for layer in response:
-            if layer['service'] != 'tms':
+            if layer['service'].lower() != 'tms':
                 logging.info('Skip %s layer because of incompatible type %s',
                              layer['name'], layer['service'])
                 continue
 
-            assert layer['service'] == 'tms', \
-                'non tms layers unsupported'
-
-            if layer.get('bounds') is None:
+            if layer.get('bounds') is None or not ',' in layer['bounds']:
                 logging.info('Skip %s layer because of incompatible bounds', layer['name'])
                 continue
 
@@ -57,12 +54,17 @@ class SoftProService:
             ).replace(
                 '{y}', '%(y)s'
             )
+
+            name_tokens = [
+                token for token in (
+                    layer['category'], layer['name']
+                ) if token is not None
+            ]
             layers.append(Layer(
-                name=slugify(layer['category'] + ' ' + layer['name']),
+                name=slugify(' '.join(name_tokens)),
                 type='tms',
                 bounds=tuple(map(float, layer['bounds'].split(','))),
                 url=f"{self._url_parts.scheme}://{self._url_parts.hostname}{url}"
             ))
-        # https://gis.khm.gov.ua/api/format/layer-list-pt?map_id=map205463
 
         return layers

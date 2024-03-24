@@ -10,7 +10,7 @@ def write_config(sources: list[TMSSourceConfig], path: Path):
     _write_seeds(path, sources)
 
 
-def _write_config(path, sources):
+def _write_config(path, configured_sources: list[TMSSourceConfig]):
     sources = {
         layer.name: dict(
             coverage=dict(
@@ -24,7 +24,7 @@ def _write_config(path, sources):
             type='tile',
             url=layer.url
         )
-        for layer in sources
+        for layer in configured_sources
     }
     layers = [
         dict(
@@ -34,7 +34,7 @@ def _write_config(path, sources):
             ],
             title=layer.name
         )
-        for layer in sources
+        for layer in configured_sources
     ]
     caches = {
         f'cache-{layer.name}': dict(
@@ -42,7 +42,7 @@ def _write_config(path, sources):
             grids=['webmercator'],
             sources=[layer.name]
         )
-        for layer in sources
+        for layer in configured_sources
     }
     services = dict(
         demo=dict(),
@@ -63,7 +63,7 @@ def _write_config(path, sources):
     return sources
 
 
-def _write_seeds(path, sources):
+def _write_seeds(path, configured_sources: list[TMSSourceConfig]):
     seeds = {
         layer.name: dict(
             caches=[
@@ -73,17 +73,17 @@ def _write_seeds(path, sources):
                 layer.name
             ],
             levels=dict(
-                to=16
+                to=18
             )
         )
-        for layer in sources
+        for layer in configured_sources
     }
     coverages = {
         layer.name: dict(
             bbox=list(layer.bounds),
             srs='EPSG:4326'
         )
-        for layer in sources
+        for layer in configured_sources
     }
     seeds = dict(
         coverages=coverages,

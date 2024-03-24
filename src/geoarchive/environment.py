@@ -1,12 +1,13 @@
 import logging
 import subprocess
+import sys
 from pathlib import Path
 
 
 def create_env(path: Path):
     logging.info('Creating environment')
     subprocess.run([
-        'python3', '-m', 'venv', str(path / '.venv')
+        sys.executable, '-m', 'venv', str(path / '.venv')
     ], check=True)
 
     logging.info('Installing dependencies')

@@ -60,8 +60,6 @@ def import_sources(path: Path, type: str, url: str):
         if click.confirm(f"Do you want to include layer {layer.name}?", default=True):
             confirmed_layers.append(layer)
 
-    click.echo(confirmed_layers)
-
     for layer in confirmed_layers:
         project.add_source(layer)
 
@@ -81,10 +79,16 @@ def rewrite(path: Path):
 
 @cli.command()
 @click.option('--path', default=workdir, type=Path)
-def serve(path: Path):
+@click.option('--bind', '-b', default=None, type=str)
+def serve(path: Path, bind: str):
     project = Project.load(path)
 
     click.echo(f'Serving project {project.name} in development mode')
     click.echo('THIS MODE SHOULD NOT BE USED IN PRODUCTION')
 
-    run_env_binary(path, 'mapproxy-util', 'serve-develop', str(path / 'mapproxy.yaml'), '--debug')
+    args = ['serve-develop',  str(path / 'mapproxy.yaml'), '--debug']
+    if bind is not None:
+        args.append('-b')
+        args.append(bind)
+
+    run_env_binary(path, 'mapproxy-util', *args)
