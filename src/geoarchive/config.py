@@ -10,6 +10,7 @@ class TMSSourceConfig(pydantic.BaseModel):
     name: str
 
     bounds: tuple[float, float, float, float]
+    bounds_srid: str = 'EPSG:4326'
 
     created_at: datetime = pydantic.Field(default_factory=datetime.now)
     cached_at: datetime | None = None

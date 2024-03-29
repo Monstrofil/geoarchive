@@ -21,7 +21,7 @@ class Project(object):
             f"Non tms ({layer.type}) is not supported right now"
 
         try:
-            exiting_layer = next(layer for name in self._config.sources if name == layer.name)
+            exiting_layer = next(source for source in self._config.sources if source.name == layer.name)
         except StopIteration:
             exiting_layer = None
 
@@ -29,7 +29,8 @@ class Project(object):
             logging.info('Layer %s does not exists, adding new', layer.name)
             self._config.sources.append(TMSSourceConfig(
                 name=layer.name, type=layer.type,
-                url=layer.url, bounds=layer.bounds
+                url=layer.url, bounds=layer.bounds,
+                bounds_srid=layer.bounds_srid
             ))
         else:
             logging.info('Layer %s already exists, updating', layer.name)

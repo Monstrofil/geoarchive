@@ -10,6 +10,7 @@ class Layer(pydantic.BaseModel):
     url: str
 
     bounds: tuple[float, float, float, float]
+    bounds_srid: str = 'EPSG:4326'
 
 
 class ServiceProtocol(typing.Protocol):
@@ -17,5 +18,5 @@ class ServiceProtocol(typing.Protocol):
     def __init__(self, url):
         ...
 
-    def list(self) -> list[Layer]:
+    def list_layers(self) -> list[Layer]:
         ...

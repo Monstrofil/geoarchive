@@ -6,6 +6,7 @@ import click
 from geoarchive.environment import run_env_binary
 from geoarchive.project import Project
 from geoarchive.services import get_service_protocol
+from geoarchive.cache import CacheService
 
 workdir = Path('.')
 
@@ -51,18 +52,28 @@ def add_source(path: Path, type: str, url: str, name: str):
 @click.option('--path', default=workdir, type=Path)
 @click.option('--type', type=str, required=True)
 @click.option('--url', type=str, required=True)
-def import_sources(path: Path, type: str, url: str):
+@click.option('--new-only', is_flag=True, type=bool)
+def import_sources(path: Path, type: str, url: str, new_only: bool = False):
     project = Project.load(path)
-    protocol = get_service_protocol(type, url)
+    service = get_service_protocol(type, url)
+
+    cache = CacheService.load(url, project_path=path)
 
     confirmed_layers = []
-    for layer in protocol.list():
+    for layer in service.list_layers():
+        if new_only and cache.exists(layer):
+            logging.info(f'Skipping layer {layer.name} because already exists in cache')
+            continue
+
         if click.confirm(f"Do you want to include layer {layer.name}?", default=True):
             confirmed_layers.append(layer)
+
+        cache.set(layer)
 
     for layer in confirmed_layers:
         project.add_source(layer)
 
+    cache.save(url, path)
     project.save(path)
 
     click.echo('Importing sources type=%s url=%s' % (type, url))

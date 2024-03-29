@@ -6,7 +6,7 @@ from typing import TypedDict, Literal, NotRequired
 import requests
 from slugify import slugify
 
-from geoarchive.services.base import Layer
+from geoarchive.services.base import Layer, ServiceProtocol
 
 
 class _SoftProLayer(TypedDict):
@@ -20,12 +20,12 @@ class _SoftProLayer(TypedDict):
     bounds: NotRequired[str]
 
 
-class SoftProService:
+class SoftProService(ServiceProtocol):
     def __init__(self, url: str):
         self._url = url
         self._url_parts = urllib.parse.urlparse(self._url)
 
-    def list(self) -> list[Layer]:
+    def list_layers(self) -> list[Layer]:
         # a lot of services of this kind have a very strange
         # ssl certificates which are not always correctly set up
         with warnings.catch_warnings():
