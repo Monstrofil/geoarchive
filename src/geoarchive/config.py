@@ -27,3 +27,5 @@ class ProjectConfig(pydantic.BaseModel):
 
     sources: List[TMSSourceConfig] = pydantic.Field(
         ..., discriminator='type', default_factory=list)
+
+    version: int = 1

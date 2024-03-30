@@ -1,9 +1,6 @@
 import logging
-import subprocess
 from pathlib import Path
 from typing import Self
-
-import yaml
 
 from geoarchive import environment, mapproxy
 from geoarchive.config import ProjectConfig, TMSSourceConfig

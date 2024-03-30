@@ -38,9 +38,9 @@ class ExtentInfo(TypedDict):
 
 class MapServiceResponse(TypedDict):
     serviceDescription: str
-    tileInfo: dict
+    tileInfo: NotRequired[dict]
 
-    initialExtent: ExtentInfo
+    fullExtent: ExtentInfo
 
     minLOD: int
     maxLOD: int
@@ -125,7 +125,7 @@ class ArcGisProtocol(ServiceProtocol):
             name_tokens = [
                 service_data['serviceDescription']
             ]
-            extent = service_data['initialExtent']
+            extent = service_data['fullExtent']
             min_x, min_y, max_x, max_y = extent['xmin'], extent['ymin'], extent['xmax'], extent['ymax']
 
             layers.append(Layer(
@@ -133,7 +133,7 @@ class ArcGisProtocol(ServiceProtocol):
                 type='tms',
                 bounds=(min_x, min_y, max_x, max_y),
                 bounds_srid=f"EPSG:{extent['spatialReference']['wkid']}",
-                url=f'{self._url}/{service["name"]}/MapServer/tile/%(z)s/%(x)s/%(y)'
+                url=f'{self._url}/{service["name"]}/MapServer/tile/{'{z}'}/{'{y}'}/{'{x}'}'
             ))
 
         return layers

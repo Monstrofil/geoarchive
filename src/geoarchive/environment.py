@@ -11,7 +11,14 @@ def create_env(path: Path):
     ], check=True)
 
     logging.info('Installing dependencies')
-    run_env_binary(path, 'pip3', 'install', 'mapproxy', 'pyproj')
+    run_env_binary(path, 'pip3', 'install',
+                   'git+https://github.com/Monstrofil/mapproxy.git',  # temporary workaround for unicode
+                   'werkzeug',
+                   'future',
+                   'importlib_resources',
+                   'pyproj',
+                   'setuptools',
+                   'requests')
 
 
 def run_env_binary(path: Path, binary: str, *args) -> None:

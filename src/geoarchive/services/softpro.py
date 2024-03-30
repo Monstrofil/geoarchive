@@ -47,14 +47,7 @@ class SoftProService(ServiceProtocol):
                 logging.info('Skip %s layer because of incompatible bounds', layer['name'])
                 continue
 
-            url = layer['url'].replace(
-                '{z}', '%(z)s'
-            ).replace(
-                '{x}', '%(x)s'
-            ).replace(
-                '{y}', '%(y)s'
-            )
-
+            url = layer['url']
             name_tokens = [
                 token for token in (
                     layer['category'], layer['name']

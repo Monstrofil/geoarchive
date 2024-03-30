@@ -15,7 +15,7 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
         layer.name: dict(
             coverage=dict(
                 bbox=list(layer.bounds),
-                srs='EPSG:4326'
+                srs=layer.bounds_srid
             ),
             http=dict(
                 ssl_no_cert_checks=True
@@ -59,7 +59,7 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
     )
 
     with open(path / 'mapproxy.yaml', 'w') as f:
-        yaml.dump(config, f, default_flow_style=False)
+        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
     return sources
 
 
@@ -81,7 +81,7 @@ def _write_seeds(path, configured_sources: list[TMSSourceConfig]):
     coverages = {
         layer.name: dict(
             bbox=list(layer.bounds),
-            srs='EPSG:4326'
+            srs=layer.bounds_srid
         )
         for layer in configured_sources
     }
@@ -89,5 +89,5 @@ def _write_seeds(path, configured_sources: list[TMSSourceConfig]):
         coverages=coverages,
         seeds=seeds
     )
-    with open(path / 'seeds.yaml', 'w') as f:
-        yaml.dump(seeds, f, default_flow_style=False)
+    with open(path / 'seeds.yaml', 'w', encoding='utf-8') as f:
+        yaml.dump(seeds, f, default_flow_style=False, allow_unicode=True)
