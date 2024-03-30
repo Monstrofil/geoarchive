@@ -25,6 +25,15 @@ def init(project_name: str):
 
 @cli.command()
 @click.option('--path', default=workdir, type=Path)
+def upgrade(path: Path):
+    project = Project.load(path)
+    project.upgrade(path)
+
+    click.echo('Upgraded the project')
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
 def status(path):
     project = Project.load(path)
 

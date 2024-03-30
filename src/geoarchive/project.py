@@ -77,3 +77,7 @@ class Project(object):
         project.save(path)
 
         return project
+
+    def upgrade(self, path: Path) -> None:
+        logging.info('Upgrading project %s', path)
+        environment.update_env(path)

@@ -11,6 +11,10 @@ def create_env(path: Path):
     ], check=True)
 
     logging.info('Installing dependencies')
+    update_env(path)
+
+
+def update_env(path: Path):
     run_env_binary(path, 'pip3', 'install',
                    'git+https://github.com/Monstrofil/mapproxy.git',  # temporary workaround for unicode
                    'werkzeug',

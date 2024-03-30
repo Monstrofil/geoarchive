@@ -123,6 +123,7 @@ class ArcGisProtocol(ServiceProtocol):
                 continue
 
             name_tokens = [
+                service['name'],
                 service_data['serviceDescription']
             ]
             extent = service_data['fullExtent']
@@ -133,7 +134,7 @@ class ArcGisProtocol(ServiceProtocol):
                 type='tms',
                 bounds=(min_x, min_y, max_x, max_y),
                 bounds_srid=f"EPSG:{extent['spatialReference']['wkid']}",
-                url=f'{self._url}/{service["name"]}/MapServer/tile/{'{z}'}/{'{y}'}/{'{x}'}'
+                url=f'{self._url}/{service["name"]}/MapServer/tile/{{z}}/{{y}}/{{x}}'
             ))
 
         return layers

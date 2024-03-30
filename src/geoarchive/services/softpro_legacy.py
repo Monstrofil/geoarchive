@@ -32,7 +32,7 @@ class SoftProService(ServiceProtocol):
             map_id = layer.find_next('input').attrs['map-layer']
             map_name = layer.find_next(attrs={'class': 'access-list__item_name'}).text
 
-            url = f"/map/rtile/carto_{map_id}/ua/{'{z}'}/{'{x}'}/{'{y}'}.png"
+            url = f"/map/rtile/carto_{map_id}/ua/{{z}}/{{x}}/{{y}}.png"
             layers.append(Layer(
                 name=slugify(map_name),
                 type='tms',
