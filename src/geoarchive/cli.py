@@ -103,3 +103,23 @@ def serve(path: Path, bind: str):
         args.append(bind)
 
     run_env_binary(path, 'mapproxy-util', *args)
+
+
+@cli.command(context_settings=dict(
+    ignore_unknown_options=True,
+    allow_extra_args=True,
+))
+@click.option('--path', default=workdir, type=Path)
+@click.pass_context
+def seed(ctx, path: Path):
+    project = Project.load(path)
+
+    click.echo(f'Serving project {project.name} in development mode')
+    click.echo('THIS MODE SHOULD NOT BE USED IN PRODUCTION')
+
+    args = [
+        '-s', str(path / 'seeds.yaml'),
+        '-f', str(path / 'mapproxy.yaml'),
+        *ctx.args]
+
+    run_env_binary(path, 'mapproxy-seed', *args)
