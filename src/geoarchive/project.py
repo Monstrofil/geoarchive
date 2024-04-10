@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Self
 
 from geoarchive import environment, mapproxy
-from geoarchive.config import ProjectConfig, TMSSourceConfig
+from geoarchive.config import ProjectConfig, TMSSourceConfig, ArcgisSourceConfig
 from geoarchive.services.base import Layer
 
 
@@ -14,9 +14,6 @@ class Project(object):
         self._config = config or ProjectConfig()
 
     def add_source(self, layer: Layer) -> None:
-        assert layer.type == 'tms', \
-            f"Non tms ({layer.type}) is not supported right now"
-
         try:
             exiting_layer = next(source for source in self._config.sources if source.name == layer.name)
         except StopIteration:
@@ -24,11 +21,21 @@ class Project(object):
 
         if exiting_layer is None:
             logging.info('Layer %s does not exists, adding new', layer.name)
-            self._config.sources.append(TMSSourceConfig(
-                name=layer.name, type=layer.type,
-                url=layer.url, bounds=layer.bounds,
-                bounds_srid=layer.bounds_srid
-            ))
+            if layer.type == 'tms':
+                source = TMSSourceConfig(
+                    name=layer.name, type=layer.type,
+                    url=layer.url, bounds=layer.bounds,
+                    bounds_srid=layer.bounds_srid
+                )
+            elif layer.type == 'arcgis':
+                source = ArcgisSourceConfig(
+                    name=layer.name, type=layer.type,
+                    url=layer.url, bounds=layer.bounds,
+                    bounds_srid=layer.bounds_srid
+                )
+            else:
+                raise NotImplementedError('Unsupported layer %s' % layer.type)
+            self._config.sources.append(source)
         else:
             logging.info('Layer %s already exists, updating', layer.name)
             exiting_layer.url = layer.url

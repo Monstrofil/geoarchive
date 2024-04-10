@@ -119,9 +119,6 @@ class ArcGisProtocol(ServiceProtocol):
                 logging.warning('Skip service %s because of permission error', service['name'])
                 continue
 
-            if not service_data.get('tileInfo'):
-                continue
-
             name_tokens = [
                 service['name'],
                 service_data['serviceDescription']
@@ -129,12 +126,24 @@ class ArcGisProtocol(ServiceProtocol):
             extent = service_data['fullExtent']
             min_x, min_y, max_x, max_y = extent['xmin'], extent['ymin'], extent['xmax'], extent['ymax']
 
+            if service_data.get('tileInfo'):
+                url = f'{self._url}/{service["name"]}/MapServer/tile/{{z}}/{{y}}/{{x}}'
+            else:
+                url = f'{self._url}/{service["name"]}/MapServer'
+
+            if extent['spatialReference'].get('wkid'):
+                srid = f"EPSG:{extent['spatialReference']['wkid']}"
+                proxy_type = 'tms'
+            else:
+                srid = extent['spatialReference']['wkt']
+                proxy_type = 'arcgis'
+
             layers.append(Layer(
                 name=slugify(' '.join(name_tokens)),
-                type='tms',
+                type=proxy_type,
                 bounds=(min_x, min_y, max_x, max_y),
-                bounds_srid=f"EPSG:{extent['spatialReference']['wkid']}",
-                url=f'{self._url}/{service["name"]}/MapServer/tile/{{z}}/{{y}}/{{x}}'
+                bounds_srid=srid,
+                url=url
             ))
 
         return layers

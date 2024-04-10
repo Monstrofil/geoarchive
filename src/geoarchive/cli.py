@@ -41,7 +41,7 @@ def status(path):
 
     click.echo('Sources:')
     for source in project.get_sources():
-        click.echo(f' - source name={source.name} type={source.type} cached={source.cached_at} refrest={source.refresh_interval}')
+        click.echo(f' - source name={source.name} type={source.type} cached={source.cached_at} refresh={source.refresh_interval}')
 
 
 @cli.command()

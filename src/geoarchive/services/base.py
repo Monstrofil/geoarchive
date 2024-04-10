@@ -6,7 +6,7 @@ import pydantic
 
 class Layer(pydantic.BaseModel):
     name: str
-    type: Literal['tms', 'wms']
+    type: Literal['tms', 'wms', 'arcgis']
     url: str
 
     bounds: tuple[float, float, float, float]

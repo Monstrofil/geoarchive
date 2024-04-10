@@ -11,21 +11,53 @@ def write_config(sources: list[TMSSourceConfig], path: Path):
 
 
 def _write_config(path, configured_sources: list[TMSSourceConfig]):
-    sources = {
-        layer.name: dict(
-            coverage=dict(
-                bbox=list(layer.bounds),
-                srs=layer.bounds_srid
-            ),
-            http=dict(
-                ssl_no_cert_checks=True
-            ),
-            grid='GLOBAL_WEBMERCATOR',
-            type='tile',
-            url=layer.url
-        )
-        for layer in configured_sources
-    }
+    sources = {}
+    for layer in configured_sources:
+        if layer.type == 'tms':
+            configration = dict(
+                coverage=dict(
+                    bbox=list(layer.bounds),
+                    srs=layer.bounds_srid
+                ),
+                http=dict(
+                    ssl_no_cert_checks=True
+                ),
+                grid='GLOBAL_WEBMERCATOR',
+                type='tile',
+                url=layer.url,
+                on_error={
+                    404: dict(
+                        response='transparent',
+                        cache=True
+                    )
+                }
+            )
+        elif layer.type == 'arcgis':
+            configration = dict(
+                coverage=dict(
+                    bbox=list(layer.bounds),
+                    srs=layer.bounds_srid
+                ),
+                http=dict(
+                    ssl_no_cert_checks=True
+                ),
+                supported_srs=[layer.bounds_srid],
+                type='arcgis',
+                req=dict(
+                    url=layer.url
+                ),
+                on_error={
+                    404: dict(
+                        response='transparent',
+                        cache=True
+                    )
+                }
+            )
+        else:
+            raise NotImplementedError("Unsupported layer %s" % layer.type)
+
+        sources[layer.name] = configration
+
     layers = [
         dict(
             name=layer.name,
