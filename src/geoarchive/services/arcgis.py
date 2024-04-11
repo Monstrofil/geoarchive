@@ -128,15 +128,15 @@ class ArcGisProtocol(ServiceProtocol):
 
             if service_data.get('tileInfo'):
                 url = f'{self._url}/{service["name"]}/MapServer/tile/{{z}}/{{y}}/{{x}}'
+                proxy_type = 'tms'
             else:
                 url = f'{self._url}/{service["name"]}/MapServer'
+                proxy_type = 'arcgis'
 
             if extent['spatialReference'].get('wkid'):
                 srid = f"EPSG:{extent['spatialReference']['wkid']}"
-                proxy_type = 'tms'
             else:
                 srid = extent['spatialReference']['wkt']
-                proxy_type = 'arcgis'
 
             layers.append(Layer(
                 name=slugify(' '.join(name_tokens)),

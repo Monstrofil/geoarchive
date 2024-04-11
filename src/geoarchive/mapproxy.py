@@ -41,10 +41,12 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
                 http=dict(
                     ssl_no_cert_checks=True
                 ),
+                image=dict(transparent=True),
                 supported_srs=[layer.bounds_srid],
                 type='arcgis',
                 req=dict(
-                    url=layer.url
+                    url=layer.url,
+                    transparent=True
                 ),
                 on_error={
                     404: dict(
@@ -72,7 +74,8 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
         f'cache-{layer.name}': dict(
             cache=dict(type='compact', version=2),
             grids=['webmercator'],
-            sources=[layer.name]
+            sources=[layer.name],
+            format='image/png'
         )
         for layer in configured_sources
     }

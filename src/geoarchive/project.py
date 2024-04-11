@@ -19,27 +19,25 @@ class Project(object):
         except StopIteration:
             exiting_layer = None
 
-        if exiting_layer is None:
-            logging.info('Layer %s does not exists, adding new', layer.name)
-            if layer.type == 'tms':
-                source = TMSSourceConfig(
-                    name=layer.name, type=layer.type,
-                    url=layer.url, bounds=layer.bounds,
-                    bounds_srid=layer.bounds_srid
-                )
-            elif layer.type == 'arcgis':
-                source = ArcgisSourceConfig(
-                    name=layer.name, type=layer.type,
-                    url=layer.url, bounds=layer.bounds,
-                    bounds_srid=layer.bounds_srid
-                )
-            else:
-                raise NotImplementedError('Unsupported layer %s' % layer.type)
-            self._config.sources.append(source)
+        logging.info('Layer %s does not exists, adding new', layer.name)
+        if layer.type == 'tms':
+            source = TMSSourceConfig(
+                name=layer.name, type=layer.type,
+                url=layer.url, bounds=layer.bounds,
+                bounds_srid=layer.bounds_srid
+            )
+        elif layer.type == 'arcgis':
+            source = ArcgisSourceConfig(
+                name=layer.name, type=layer.type,
+                url=layer.url, bounds=layer.bounds,
+                bounds_srid=layer.bounds_srid
+            )
         else:
-            logging.info('Layer %s already exists, updating', layer.name)
-            exiting_layer.url = layer.url
-            exiting_layer.bounds = layer.bounds
+            raise NotImplementedError('Unsupported layer %s' % layer.type)
+
+        if exiting_layer is not None:
+            self._config.sources.remove(exiting_layer)
+        self._config.sources.append(source)
 
     def get_sources(self) -> list[TMSSourceConfig]:
         return self._config.sources
