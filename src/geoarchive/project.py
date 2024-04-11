@@ -24,13 +24,15 @@ class Project(object):
             source = TMSSourceConfig(
                 name=layer.name, type=layer.type,
                 url=layer.url, bounds=layer.bounds,
-                bounds_srid=layer.bounds_srid
+                bounds_srid=layer.bounds_srid,
+                opts=layer.opts
             )
         elif layer.type == 'arcgis':
             source = ArcgisSourceConfig(
                 name=layer.name, type=layer.type,
                 url=layer.url, bounds=layer.bounds,
-                bounds_srid=layer.bounds_srid
+                bounds_srid=layer.bounds_srid,
+                opts=layer.opts
             )
         else:
             raise NotImplementedError('Unsupported layer %s' % layer.type)

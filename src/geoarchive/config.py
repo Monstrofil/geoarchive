@@ -16,6 +16,7 @@ class TMSSourceConfig(pydantic.BaseModel):
     cached_at: datetime | None = None
 
     refresh_interval: int | None = None
+    opts: dict | None = None
 
 
 class ArcgisSourceConfig(pydantic.BaseModel):
@@ -30,6 +31,7 @@ class ArcgisSourceConfig(pydantic.BaseModel):
     cached_at: datetime | None = None
 
     refresh_interval: int | None = None
+    opts: dict | None = None
 
 
 class WMSSourceConfig(pydantic.BaseModel):

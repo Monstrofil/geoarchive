@@ -46,7 +46,7 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
                 type='arcgis',
                 req=dict(
                     url=layer.url,
-                    transparent=True
+                    transparent=True,
                 ),
                 on_error={
                     404: dict(
@@ -55,6 +55,9 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
                     )
                 }
             )
+
+            if layer.opts and layer.opts['layers']:
+                configration['req']['layers'] = layer.opts['layers']
         else:
             raise NotImplementedError("Unsupported layer %s" % layer.type)
 

@@ -12,6 +12,8 @@ class Layer(pydantic.BaseModel):
     bounds: tuple[float, float, float, float]
     bounds_srid: str = 'EPSG:4326'
 
+    opts: dict | None = None
+
 
 class ServiceProtocol(typing.Protocol):
 

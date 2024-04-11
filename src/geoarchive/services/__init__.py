@@ -1,10 +1,12 @@
 from . import softpro
 from . import softpro_legacy
 from . import arcgis
+from . import arcgis_layers
 from .base import ServiceProtocol
 
 _services = {
     'arcgis': arcgis.ArcGisProtocol,
+    'arcgis_layers': arcgis_layers.ArcGisProtocol,
     'softpro': softpro.SoftProService,
     'softpro_legacy': softpro_legacy.SoftProService
 }
