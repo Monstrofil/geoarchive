@@ -40,8 +40,12 @@ def status(path):
     click.echo(f'Project: {project.name}')
 
     click.echo('Sources:')
-    for source in project.get_sources():
+    for name, source in project.get_sources().items():
         click.echo(f' - source name={source.name} type={source.type} cached={source.cached_at} refresh={source.refresh_interval}')
+
+    click.echo('Caches:')
+    for name, cache in project.get_caches().items():
+        click.echo(f' - source name={cache.name} sources={cache.sources}')
 
 
 @cli.command()
@@ -55,6 +59,19 @@ def add_source(path: Path, type: str, url: str, name: str):
     project.save(path)
 
     click.echo('Adding source name=%s type=%s url=%s' % (name, type, url))
+
+
+@cli.command()
+@click.option('--path', default=workdir, type=Path)
+@click.option('--name', type=str, required=True)
+@click.option('--sources', type=str, required=True)
+def add_cache(path: Path, name: str, sources: str):
+    project = Project.load(path)
+
+    layers = sources.split(',')
+    project.add_cache(name, layers)
+
+    project.save(path)
 
 
 @cli.command()

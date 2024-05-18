@@ -1,16 +1,17 @@
 from pathlib import Path
+from typing import Iterable
 
 import yaml
 
-from geoarchive.config import TMSSourceConfig
+from geoarchive.config import TMSSourceConfig, CacheConfig
 
 
-def write_config(sources: list[TMSSourceConfig], path: Path):
-    _write_config(path, sources)
-    _write_seeds(path, sources)
+def write_config(sources: Iterable[TMSSourceConfig], path: Path, additional_caches: list[CacheConfig] | None = None):
+    _write_config(path, sources, additional_caches)
+    _write_seeds(path, sources, additional_caches)
 
 
-def _write_config(path, configured_sources: list[TMSSourceConfig]):
+def _write_config(path, configured_sources: Iterable[TMSSourceConfig], additional_caches: list[CacheConfig] | None = None):
     sources = {}
     for layer in configured_sources:
         if layer.type == 'tms':
@@ -73,6 +74,18 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
         )
         for layer in configured_sources
     ]
+
+    for cache in additional_caches:
+        layers.append(
+            dict(
+                name=cache.name,
+                sources=[
+                    f'cache-merged-{cache.name}'
+                ],
+                title=cache.name
+            )
+        )
+
     caches = {
         f'cache-{layer.name}': dict(
             cache=dict(type='compact', version=2),
@@ -82,6 +95,15 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
         )
         for layer in configured_sources
     }
+
+    for cache in additional_caches:
+        caches[f'cache-merged-{cache.name}'] = dict(
+            cache=dict(type='compact', version=2),
+            grids=cache.grids,
+            sources=cache.sources,
+            format='image/png'
+        )
+
     services = dict(
         demo=dict(),
         tms=dict()
@@ -101,7 +123,7 @@ def _write_config(path, configured_sources: list[TMSSourceConfig]):
     return sources
 
 
-def _write_seeds(path, configured_sources: list[TMSSourceConfig]):
+def _write_seeds(path, configured_sources: Iterable[TMSSourceConfig], additional_caches: list[CacheConfig] | None = None):
     seeds = {
         layer.name: dict(
             caches=[
@@ -116,6 +138,9 @@ def _write_seeds(path, configured_sources: list[TMSSourceConfig]):
         )
         for layer in configured_sources
     }
+
+    # todo: seeds for additional_caches?
+
     coverages = {
         layer.name: dict(
             bbox=list(layer.bounds),

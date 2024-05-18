@@ -1,7 +1,15 @@
 from datetime import datetime
-from typing import Literal, List
+from typing import Literal, List, Annotated
 
 import pydantic
+from pydantic import TypeAdapter, Field
+
+
+class CacheConfig(pydantic.BaseModel):
+    name: str
+    sources: list[str]
+
+    grids: list[str] = pydantic.Field(default_factory=lambda: ['webmercator'])
 
 
 class TMSSourceConfig(pydantic.BaseModel):
@@ -38,10 +46,41 @@ class WMSSourceConfig(pydantic.BaseModel):
     type: Literal['wms']
 
 
-class ProjectConfig(pydantic.BaseModel):
+class ProjectConfigV2(pydantic.BaseModel):
+    name: str
+
+    sources: dict[str, TMSSourceConfig | ArcgisSourceConfig] = pydantic.Field(
+        ..., discriminator='type', default_factory=dict)
+
+    caches: dict[str, CacheConfig] = pydantic.Field(
+        ..., default_factory=dict
+    )
+
+    version: Literal[2] = 2
+
+    def upgrade(self) -> None:
+        return None
+
+
+class ProjectConfigV1(pydantic.BaseModel):
     name: str
 
     sources: List[TMSSourceConfig | ArcgisSourceConfig] = pydantic.Field(
         ..., discriminator='type', default_factory=list)
 
-    version: int = 1
+    version: Literal[1] = 1
+
+    def upgrade(self) -> ProjectConfigV2:
+        return ProjectConfigV2(
+            name=self.name,
+            sources={
+                source.name: source
+                for source in self.sources
+            }
+        )
+
+
+_ProjectConfig = ProjectConfigV1 | ProjectConfigV2
+_AnnotatedProjectConfig = Annotated[_ProjectConfig, Field(discriminator="version")]
+ProjectConfigDynamic: TypeAdapter[_ProjectConfig] = TypeAdapter(_AnnotatedProjectConfig)
+ProjectConfig = ProjectConfigV2  # keep reference to the latest here
