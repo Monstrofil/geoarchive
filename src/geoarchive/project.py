@@ -92,7 +92,7 @@ class Project(object):
         return cls(config=configuration)
 
     @classmethod
-    def create(cls, path: Path, name: str) -> Self:
+    def create(cls, path: Path, name: str, create_environment = True) -> Self:
         logging.info('Creating project %s', path)
         config_file = path / cls._CONFIG_FILE
         if config_file.exists():
@@ -103,7 +103,8 @@ class Project(object):
 
         configuration = ProjectConfig(name=name)
         project = cls(config=configuration)
-        environment.create_env(path)
+        if create_environment:
+            environment.create_env(path)
         project.save(path)
 
         return project
